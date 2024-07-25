@@ -2,7 +2,8 @@ import "./style.css";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 export default defineContentScript({
-  matches: ["*://pgy.xiaohongshu.com/solar/pre-trade/blogger-detail/*"],
+  // matches: ["*://pgy.xiaohongshu.com/solar/pre-trade/blogger-detail/*"],
+  matches: ["*://*/*"],
   cssInjectionMode: "ui",
   runAt: "document_start",
   async main(ctx) {
