@@ -1,24 +1,36 @@
 import "./style.css";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
+import createCache from "@emotion/cache";
+import { CacheProvider } from "@emotion/react";
 export default defineContentScript({
-  // matches: ["*://pgy.xiaohongshu.com/solar/pre-trade/blogger-detail/*"],
-  matches: ["*://*/*"],
+  matches: ["*://pgy.xiaohongshu.com/solar/pre-trade/blogger-detail/*"],
+  // matches: ["*://*/*"],
   cssInjectionMode: "ui",
-  runAt: "document_start",
+  runAt: "document_end",
   async main(ctx) {
     const ui = await createShadowRootUi(ctx, {
       name: "wxt-ui",
       position: "inline",
       append: "first",
       onMount: (container) => {
-        // Container is a body, and React warns when creating a root on the body, so create a wrapper div
-        const app = document.createElement("div");
-        container.append(app);
+        const shadowContainer = container.attachShadow({ mode: "open" });
+        const shadowRootElement = document.createElement("div");
+        shadowContainer.appendChild(shadowRootElement);
+
+        const cache = createCache({
+          key: "css",
+          prepend: true,
+          container: shadowContainer,
+        });
 
         // Create a root on the UI container and render a component
-        const root = ReactDOM.createRoot(app);
-        root.render(<App />);
+        const root = ReactDOM.createRoot(shadowRootElement);
+        root.render(
+          <CacheProvider value={cache}>
+            <App />
+          </CacheProvider>
+        );
         return root;
       },
       onRemove: (root) => {
